@@ -4,10 +4,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,15 +35,15 @@ public class CrimeListFragment extends Fragment {
         return view;
     }
 
-    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private abstract class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mTitleTextView;
         private TextView mDateTextView;
 
         private Crime mCrime;
 
-        public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item_crime, parent, false));
+        public CrimeHolder(LayoutInflater inflater, ViewGroup parent, int layout) {
+            super(inflater.inflate(layout, parent, false));
 
             mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
             mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
@@ -62,6 +62,39 @@ public class CrimeListFragment extends Fragment {
         }
     }
 
+    private class RegularCrime extends CrimeHolder {
+
+        public RegularCrime(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater, parent, R.layout.list_item_crime);
+        }
+    }
+
+    private class SeriousCrime extends CrimeHolder {
+
+        private Button mContactPoliceButton;
+
+        public SeriousCrime(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater, parent, R.layout.list_item_serious_crime);
+
+            mContactPoliceButton = (Button) itemView.findViewById(R.id.contact_police_button);
+        }
+
+        @Override
+        public void bind(Crime crime) {
+            super.bind(crime);
+
+            SeriousCrime.super.mTitleTextView.setText(SeriousCrime.super.mCrime.getTitle() + " (Serious!)");
+
+            mContactPoliceButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getActivity(), "The police have been contacted for " + SeriousCrime.super.mCrime.getTitle(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
 
         private List<Crime> mCrimes;
@@ -71,10 +104,23 @@ public class CrimeListFragment extends Fragment {
         }
 
         @Override
+        public int getItemViewType(int position) {
+            Crime crime = mCrimes.get(position);
+            if (crime.isRequiresPolice()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        @Override
         public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-
-            return new CrimeHolder(layoutInflater, parent);
+                if (viewType == 1) {
+                    return new SeriousCrime(layoutInflater, parent);
+                } else {
+                    return new RegularCrime(layoutInflater, parent);
+                }
         }
 
         @Override
