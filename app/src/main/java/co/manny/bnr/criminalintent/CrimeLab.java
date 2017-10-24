@@ -3,6 +3,7 @@ package co.manny.bnr.criminalintent;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ public class CrimeLab {
     private static CrimeLab sCrimeLab;
 
     private List<Crime> mCrimes;
+    private HashMap<UUID, Crime> mCrimeLookupTable = new HashMap<UUID, Crime>();
 
     public static CrimeLab get(Context context) {
         if (sCrimeLab == null) {
@@ -29,6 +31,7 @@ public class CrimeLab {
             crime.setTitle("Crime #" + i);
             crime.setSolved(i % 2 == 0);
             mCrimes.add(crime);
+            mCrimeLookupTable.put(crime.getId(), crime);
         }
     }
 
@@ -37,11 +40,6 @@ public class CrimeLab {
     }
 
     public Crime getCrime(UUID id) {
-        for(Crime crime : mCrimes) {
-            if (crime.getId().equals(id)) {
-                return crime;
-            }
-        }
-        return null;
+        return mCrimeLookupTable.get(id);
     }
 }
