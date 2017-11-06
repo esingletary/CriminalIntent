@@ -8,6 +8,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +24,8 @@ public class CrimePagerActivity extends AppCompatActivity {
             "co.manny.bnr.criminalintent.crime_id";
 
     private ViewPager mViewPager;
+    private Button mSkipToBeginningButton;
+    private Button mSkipToEndButton;
     private List<Crime> mCrimes;
 
     public static Intent newIntent(Context packageContext, UUID crimeId) {
@@ -40,8 +44,26 @@ public class CrimePagerActivity extends AppCompatActivity {
 
         mViewPager = (ViewPager) findViewById(R.id.crime_view_pager);
 
+        mSkipToBeginningButton = (Button) findViewById(R.id.skip_to_beginning_button);
+        mSkipToEndButton = (Button) findViewById(R.id.skip_to_end_button);
+
         mCrimes = CrimeLab.get(this).getCrimes();
         FragmentManager fragmentManager = getSupportFragmentManager();
+
+        mSkipToBeginningButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(0);
+            }
+        });
+
+        mSkipToEndButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(mCrimes.size() - 1);
+            }
+        });
+
         mViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
             @Override
             public Fragment getItem(int position) {
@@ -54,6 +76,31 @@ public class CrimePagerActivity extends AppCompatActivity {
                 return mCrimes.size();
             }
         });
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                mSkipToBeginningButton.setEnabled(true);
+                mSkipToEndButton.setEnabled(true);
+                if (mViewPager.getCurrentItem() == 0) {
+                    mSkipToBeginningButton.setEnabled(false);
+                } else if (mViewPager.getCurrentItem() == mCrimes.size() - 1) {
+                    mSkipToEndButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         for (int i = 0; i < mCrimes.size(); i++) {
             if(mCrimes.get(i).getId().equals(crimeId)) {
                 mViewPager.setCurrentItem(i);
