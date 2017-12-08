@@ -35,7 +35,7 @@ public class CrimeFragment extends Fragment {
     private Crime mCrime;
     private EditText mTitleField;
     private CheckBox mSolvedCheckBox;
-    private Button mDateButton;
+    private Button mDateButton, mDeleteButton;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -92,6 +92,15 @@ public class CrimeFragment extends Fragment {
                 DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
                 dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
                 dialog.show(manager, DIALOG_DATE);
+            }
+        });
+
+        mDeleteButton = (Button) view.findViewById(R.id.delete_crime);
+        mDeleteButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CrimeLab.get(getContext()).deleteCrime(mCrime);
+                getActivity().finish();
             }
         });
 
