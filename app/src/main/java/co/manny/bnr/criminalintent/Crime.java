@@ -13,6 +13,7 @@ public class Crime {
     private String mTitle;
 
     private String mSuspect;
+    private String mSuspectNumber;
     private Date mDate;
     private boolean mSolved;
 
@@ -61,4 +62,11 @@ public class Crime {
         mSuspect = suspect;
     }
 
+    public String getSuspectNumber() {
+        return mSuspectNumber;
+    }
+
+    public void setSuspectNumber(String SuspectNumber) {
+        mSuspectNumber = SuspectNumber;
+    }
 }
